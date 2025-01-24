@@ -1,20 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 function SimpleChatbot() {
+  // All messages are kept in this array
   const [messages, setMessages] = useState([]);
 
+  // User input state
   const [userInput, setUserInput] = useState('');
-  
+
+  // Reference to the chat box, so we can adjust scroll
   const chatBoxRef = useRef(null);
 
+  // Scroll to the bottom when messages change
   useEffect(() => {
-
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
   }, [messages]);
 
-  const handleSend = () => {
+  // Function to handle sending messages
+  const handleSend = async () => {
     if (!userInput.trim()) return;
 
     const userMessage = {
@@ -22,16 +26,45 @@ function SimpleChatbot() {
       sender: 'user',
     };
 
-    const botMessage = {
-      text: `You said: "${userInput}"`,
-      sender: 'bot',
-    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
 
-    setMessages((prevMessages) => [...prevMessages, userMessage, botMessage]);
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/v1/query', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ chat_query: userInput }),
+      });
+
+      if (response.ok) {
+        const botResponse = await response.text();
+
+        const botMessage = {
+          text: botResponse,
+          sender: 'bot',
+        };
+
+        setMessages((prevMessages) => [...prevMessages, botMessage]);
+      } else {
+        const errorMessage = {
+          text: 'Sorry, something went wrong with the server.',
+          sender: 'bot',
+        };
+
+        setMessages((prevMessages) => [...prevMessages, errorMessage]);
+      }
+    } catch (error) {
+      const errorMessage = {
+        text: 'Error connecting to the server.',
+        sender: 'bot',
+      };
+
+      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+    }
 
     setUserInput('');
   };
-
 
   return (
     <div style={styles.container}>
@@ -86,15 +119,13 @@ function SimpleChatbot() {
 
 const styles = {
   container: {
-    /* Center the chatbot on the page */
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-
-    /* Take up full viewport height */
     height: '100vh',
     width: '100%',
+    backgroundColor: '#f2f2f2',
   },
   chatBox: {
     width: '300px',
@@ -104,10 +135,7 @@ const styles = {
     marginBottom: '10px',
     padding: '10px',
     backgroundColor: '#98AB8E',
-
-    /* Allow scrolling to see older messages */
     overflowY: 'auto',
-
     display: 'flex',
     flexDirection: 'column',
   },
@@ -132,7 +160,6 @@ const styles = {
     wordWrap: 'break-word',
   },
   animatedMessage: {
-    /* Apply the fade-in-up animation to new messages */
     animation: 'fadeInUp 0.3s ease-out',
   },
   input: {
