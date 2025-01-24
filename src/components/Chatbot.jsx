@@ -1,87 +1,40 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 function SimpleChatbot() {
-  // All messages are kept in this array
   const [messages, setMessages] = useState([]);
-  
-  // How many of the newest messages we display at once
-  const INITIAL_VISIBLE_COUNT = 6;    // show last 6 messages by default
-  const LOAD_MORE_COUNT = 6;         // load 6 more when scrolling up
-  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
 
   const [userInput, setUserInput] = useState('');
   
-  // Reference to the chat box, so we can adjust scroll
   const chatBoxRef = useRef(null);
 
-  // Whenever messages or visibleCount changes,
-  // automatically scroll to the bottom (only if a new message was sent).
   useEffect(() => {
-    // After a new message, scroll to bottom
-    // (But we only do this if the user is actually sending a new message.)
-    // A simple approach is to just scroll to bottom every time messages change:
+
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
-  }, [messages, visibleCount]);
+  }, [messages]);
 
-  // Handle user sending a new message
   const handleSend = () => {
     if (!userInput.trim()) return;
 
-    // User message
     const userMessage = {
       text: userInput,
       sender: 'user',
     };
 
-    // Mock bot response
     const botMessage = {
       text: `You said: "${userInput}"`,
       sender: 'bot',
     };
 
-    // Update the messages list (keeping all of them)
     setMessages((prevMessages) => [...prevMessages, userMessage, botMessage]);
 
-    // Always display at least the new pair of messages (2 more)
-    // in case visibleCount was small
-    setVisibleCount((prev) => {
-      let newCount = prev;
-      // We add 2 messages: userMessage + botMessage
-      // If we don't have enough room to show them, increase visibleCount
-      if (messages.length + 2 > prev) {
-        newCount = messages.length + 2;
-      }
-      return newCount;
-    });
-
-    // Clear the input
     setUserInput('');
   };
 
-  // Handle scrolling up to load older messages
-  const handleScroll = () => {
-    const box = chatBoxRef.current;
-    if (!box) return;
-
-    // If the user is at the top, load older messages
-    if (box.scrollTop === 0) {
-      setVisibleCount((prev) => {
-        // show older messages in increments
-        const newCount = prev + LOAD_MORE_COUNT;
-        return Math.min(newCount, messages.length);
-      });
-    }
-  };
-
-  // Only render the last `visibleCount` messages
-  const startIndex = Math.max(messages.length - visibleCount, 0);
-  const visibleMessages = messages.slice(startIndex);
 
   return (
     <div style={styles.container}>
-      {/* Inline keyframe definition for fadeInUp */}
       <style>
         {`
           @keyframes fadeInUp {
@@ -97,8 +50,8 @@ function SimpleChatbot() {
         `}
       </style>
 
-      <div style={styles.chatBox} ref={chatBoxRef} onScroll={handleScroll}>
-        {visibleMessages.map((msg, index) => (
+      <div style={styles.chatBox} ref={chatBoxRef}>
+        {messages.map((msg, index) => (
           <div
             key={index}
             style={
@@ -142,16 +95,15 @@ const styles = {
     /* Take up full viewport height */
     height: '100vh',
     width: '100%',
-    backgroundColor: '#f2f2f2',
   },
   chatBox: {
     width: '300px',
-    height: '400px',
+    height: '500px',
     border: '1px solid #ccc',
     borderRadius: '8px',
     marginBottom: '10px',
     padding: '10px',
-    backgroundColor: '#fff',
+    backgroundColor: '#98AB8E',
 
     /* Allow scrolling to see older messages */
     overflowY: 'auto',
@@ -162,7 +114,7 @@ const styles = {
   userMessage: {
     alignSelf: 'flex-end',
     background: '#007bff',
-    color: '#fff',
+    color: '#000',
     padding: '8px 12px',
     borderRadius: '16px',
     margin: '4px 0',
@@ -170,6 +122,7 @@ const styles = {
     wordWrap: 'break-word',
   },
   botMessage: {
+    color: '#000',
     alignSelf: 'flex-start',
     background: '#e2e2e2',
     padding: '8px 12px',
@@ -195,7 +148,7 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     backgroundColor: '#28a745',
-    color: '#fff',
+    color: '#000',
     cursor: 'pointer',
     fontSize: '16px',
   },

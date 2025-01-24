@@ -1,10 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './components/Home';
 import Chatbot from './components/Chatbot';
-import History from './components/History';
-import ExtensionStore from './components/ExtensionStore';
+import Diary from './components/Diary';
+import AppStore from './components/AppStore';
 
 function App() {
   return (
@@ -13,8 +13,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/chatbot" element={<Chatbot />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/extension-store" element={<ExtensionStore />} />
+          <Route path="/diary" element={<Diary />} />
+          <Route path="/app-store" element={<AppStore />} />
         </Routes>
       </Layout>
     </Router>
@@ -22,3 +22,4 @@ function App() {
 }
 
 export default App;
+
