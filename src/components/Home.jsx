@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import backgroundImage from '../assets/images/background.webp';
+
 
 function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -10,7 +12,8 @@ function Home() {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundImage: 'url("/images/background.webp")',
+    backgroundImage: `url(${backgroundImage})`,
+    // backgroundImage: 'url("/images/background.webp")',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundAttachment: 'fixed',
