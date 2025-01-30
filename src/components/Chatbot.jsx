@@ -1,23 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 function SimpleChatbot() {
-  // All messages are kept in this array
   const [messages, setMessages] = useState([]);
-
-  // User input state
   const [userInput, setUserInput] = useState('');
-
-  // Reference to the chat box, so we can adjust scroll
   const chatBoxRef = useRef(null);
 
-  // Scroll to the bottom when messages change
   useEffect(() => {
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
   }, [messages]);
 
-  // Function to handle sending messages
   const handleSend = async () => {
     if (!userInput.trim()) return;
 
@@ -38,11 +31,12 @@ function SimpleChatbot() {
       });
 
       if (response.ok) {
-        const botResponse = await response.text();
+        const botResponse = await response.json();
 
         const botMessage = {
-          text: botResponse,
+          text: botResponse.response,
           sender: 'bot',
+          image: botResponse.image, // Handle image if available
         };
 
         setMessages((prevMessages) => [...prevMessages, botMessage]);
@@ -84,19 +78,27 @@ function SimpleChatbot() {
       </style>
 
       <div style={styles.chatBox} ref={chatBoxRef}>
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            style={
-              msg.sender === 'user'
-                ? { ...styles.userMessage, ...styles.animatedMessage }
-                : { ...styles.botMessage, ...styles.animatedMessage }
-            }
-          >
-            {msg.text}
-          </div>
-        ))}
-      </div>
+  {messages.map((msg, index) => (
+    <div
+      key={index}
+      style={
+        msg.sender === 'user'
+          ? { ...styles.userMessage, ...styles.animatedMessage }
+          : { ...styles.botMessage, ...styles.animatedMessage }
+      }
+    >
+      {msg.text}
+      {msg.image && (
+        <img
+          src={`data:image/jpeg;base64,${msg.image}`}
+          alt="response-visual"
+          style={styles.image}
+        />
+      )}
+    </div>
+  ))}
+</div>
+
 
       <input
         style={styles.input}
@@ -161,6 +163,13 @@ const styles = {
   },
   animatedMessage: {
     animation: 'fadeInUp 0.3s ease-out',
+  },
+  image: {
+    marginTop: '10px',
+    maxWidth: '100%',
+    maxHeight: '200px',
+    borderRadius: '8px',
+    boxShadow: '0px 0px 4px rgba(0,0,0,0.2)',
   },
   input: {
     width: '300px',
