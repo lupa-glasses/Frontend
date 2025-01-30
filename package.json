@@ -1,5 +1,5 @@
 {
-  "homepage": "https://github.com/natnaelteshome/frontend",
+  "homepage": "https://lupa-glasses.github.io/Frontend",
   "dependencies": {
     "framer-motion": "^12.0.1",
     "react": "^19.0.0",
@@ -22,6 +22,6 @@
     "start": "webpack serve --mode development",
     "build": "webpack --mode production",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist --add"
   }
 }
